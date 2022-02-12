@@ -31,11 +31,7 @@ namespace xmlbriefer
         private void PrintImpl(XName element, int level, HashSet<XName> done)
         {
             Indent(level);
-            Console.Write(element.LocalName);
-            if (element.Namespace != XNamespace.None)
-            {
-                Console.Write("{0}{1}{2}", '{', element.NamespaceName, '}');
-            }
+            WriteName(element);
             if (done.Contains(element))
             {
                 Console.WriteLine(" =");
@@ -43,15 +39,22 @@ namespace xmlbriefer
             else
             {
                 Console.WriteLine();
+                done.Add(element);
                 var current = Pool[element];
                 // TODO: print some auxiliary information on the current element here.
+                foreach (var attribute in current.Attributes)
+                {
+                    Indent(level + 1);
+                    Console.Write("@");
+                    WriteName(attribute);
+                    Console.WriteLine();
+                }
                 if (current.HasTextContents)
                 {
                     Indent(level + 1);
                     Console.WriteLine(TextNodeLabel);
                 }
-                done.Add(element);
-                foreach (var child in Pool[element].Children)
+                foreach (var child in current.Children)
                 {
                     PrintImpl(child, level + 1, done);
                 }
@@ -72,6 +75,15 @@ namespace xmlbriefer
             if (level > 0)
             {
                 Console.Write(Spacer, 0, level);
+            }
+        }
+
+        private void WriteName(XName name)
+        {
+            Console.Write(name.LocalName);
+            if (name.Namespace != XNamespace.None)
+            {
+                Console.Write("{0}{1}{2}", '{', name.NamespaceName, '}');
             }
         }
     }
