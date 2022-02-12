@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace xmlbriefer
 {
@@ -33,6 +35,24 @@ namespace xmlbriefer
                 }
             }
             return true;
+        }
+
+        /// <summary>Expands a filename pattern.</summary>
+        /// <param name="pattern">The filename pattern.</param>
+        /// <returns>The list of actual filenames.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pattern"/> is null.</exception>
+        /// <exception cref="IOException">An error occurred when accessing to a file system.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller lacks the required permission.</exception>
+        public static IEnumerable<string> ExpandPattern(string pattern)
+        {
+            if (pattern is null) throw new ArgumentNullException(nameof(pattern));
+            if (File.Exists(pattern))
+            {
+                return new[] { pattern };
+            }
+            var directory = Path.GetDirectoryName(pattern);
+            var wildcard = Path.GetFileName(pattern);
+            return Directory.GetFiles(directory, wildcard);
         }
     }
 }
