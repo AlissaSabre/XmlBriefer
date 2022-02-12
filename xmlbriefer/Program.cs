@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Linq;
 
 namespace xmlbriefer
 {
@@ -6,6 +7,14 @@ namespace xmlbriefer
     {
         static void Main(string[] args)
         {
+            var pool = new ElementPool();
+            foreach (var filename in args)
+            {
+                var xml = XElement.Load(filename);
+                pool.AddElements(xml);
+            }
+            var printer = new ElementInfoPrinter(pool);
+            printer.Print();
         }
     }
 }
